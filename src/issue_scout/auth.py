@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import platform
+import sys
 import time
 import webbrowser
 from datetime import datetime, timezone
@@ -135,6 +136,8 @@ def device_login(
         )
     else:
         print(f"Open {verification_uri} and enter code: {user_code}")
+    sys.stdout.flush()
+    sys.stderr.flush()
 
     if open_browser:
         try:
