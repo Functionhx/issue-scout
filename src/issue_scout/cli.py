@@ -183,5 +183,17 @@ def auth_status():
         )
 
 
+_KNOWN_COMMANDS = {"scout", "login", "logout", "auth", "--help", "-h", "--version"}
+
+
+def main(argv: Optional[list[str]] = None) -> None:
+    """Entry point that lets `issue-scout owner/repo` work as a shorthand
+    for `issue-scout scout owner/repo` (back-compat with v0.1)."""
+    args = list(sys.argv[1:] if argv is None else argv)
+    if args and args[0] not in _KNOWN_COMMANDS and not args[0].startswith("-"):
+        args = ["scout", *args]
+    app(args)
+
+
 if __name__ == "__main__":
-    app()
+    main()

@@ -244,3 +244,37 @@ def test_auth_status_saved(isolated_auth):
     result = runner.invoke(app, ["auth", "status"])
     assert result.exit_code == 0
     assert "saved" in result.stdout
+
+
+# ---------- shorthand entry point (v0.1 back-compat) ----------
+
+def test_main_rewrites_repo_to_scout_subcommand(monkeypatch, isolated_auth, patched_rest_client):
+    """`issue-scout owner/repo` should still work as in v0.1."""
+    from issue_scout import cli as cli_module
+
+    captured: list[list[str]] = []
+
+    def fake_app(args):
+        captured.append(args)
+
+    monkeypatch.setattr(cli_module, "app", fake_app)
+    cli_module.main(["o/r", "--max-issues", "1"])
+    assert captured == [["scout", "o/r", "--max-issues", "1"]]
+
+
+def test_main_leaves_known_subcommand_alone(monkeypatch):
+    from issue_scout import cli as cli_module
+
+    captured: list[list[str]] = []
+    monkeypatch.setattr(cli_module, "app", lambda args: captured.append(args))
+    cli_module.main(["login", "--no-browser"])
+    assert captured == [["login", "--no-browser"]]
+
+
+def test_main_leaves_help_flag_alone(monkeypatch):
+    from issue_scout import cli as cli_module
+
+    captured: list[list[str]] = []
+    monkeypatch.setattr(cli_module, "app", lambda args: captured.append(args))
+    cli_module.main(["--help"])
+    assert captured == [["--help"]]

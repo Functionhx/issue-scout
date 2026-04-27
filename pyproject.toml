@@ -41,7 +41,7 @@ dev = [
 ]
 
 [project.scripts]
-issue-scout = "issue_scout.cli:app"
+issue-scout = "issue_scout.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/issue-scout/issue-scout"
