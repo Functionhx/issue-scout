@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gh-issue-scout"
+version = "0.1.0"
+description = "Find open GitHub issues nobody is working on — detects claims even in comments and highlights difficulty labels."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Issue Scout Contributors" }]
+keywords = ["github", "issues", "cli", "open-source", "contributors", "graphql"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "requests>=2.32",
+    "python-dateutil>=2.8",
+    "typer>=0.12",
+    "rich>=13",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-cov",
+    "ruff>=0.5",
+    "mypy>=1.10",
+]
+
+[project.scripts]
+issue-scout = "issue_scout.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/issue-scout/issue-scout"
+Issues = "https://github.com/issue-scout/issue-scout/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/issue_scout"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+# B008: Typer relies on typer.Option(...) as default values — that is idiomatic, not a bug.
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+# Long lines in scripts/, formatters f-strings, and docstrings are fine.
+"scripts/*" = ["E501"]
+"src/issue_scout/formatters.py" = ["E501"]
+"src/issue_scout/claim_detector.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=src/issue_scout --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["src/issue_scout"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
