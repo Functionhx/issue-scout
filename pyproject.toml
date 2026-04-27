@@ -64,6 +64,7 @@ ignore = ["B008"]
 "scripts/*" = ["E501"]
 "src/issue_scout/formatters.py" = ["E501"]
 "src/issue_scout/claim_detector.py" = ["E501"]
+"src/issue_scout/auth.py" = ["E501"]
 # Typer evaluates annotations at runtime; PEP 604 unions break on Python 3.9.
 "src/issue_scout/cli.py" = ["UP007", "UP045"]
 

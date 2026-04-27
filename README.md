@@ -37,19 +37,49 @@ pip install -e .
 
 ## Authentication
 
-A GitHub token is **required**. The GitHub GraphQL API does not accept anonymous
-requests — you'll get `401 Bad credentials` without one.
+issue-scout supports **three** authentication modes — pick whichever fits.
 
-1. Go to <https://github.com/settings/tokens> (or
-   [fine-grained tokens](https://github.com/settings/personal-access-tokens/new)).
-2. Create a token. **No permissions are required** for public repos.
-3. Export it:
+### 1. Anonymous (no setup)
 
-   ```bash
-   export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
-   ```
+Just run it. Great for trying things out:
 
-   Or pass it via `--token`.
+```bash
+issue-scout vllm-project/vllm --max-issues 5
+```
+
+The tool falls back to the public REST API. **Limit: 60 requests/hour.** A
+small repo scan will work fine; bigger scans hit the limit fast — switch to
+one of the modes below.
+
+### 2. Browser login (recommended)
+
+Run once and you're done:
+
+```bash
+issue-scout login          # opens GitHub in your browser, ask you to enter a code
+issue-scout auth status    # confirm the saved token
+issue-scout owner/repo     # subsequent runs use the saved token automatically
+```
+
+Token is stored at `~/.config/issue-scout/auth.json` (mode 0600). Remove it
+with `issue-scout logout`.
+
+### 3. Personal access token
+
+Useful for CI, scripts, or if you already have a `gh` token lying around:
+
+```bash
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
+issue-scout owner/repo
+# or one-off:
+issue-scout owner/repo --token ghp_xxx
+```
+
+Create a no-permission fine-grained token at <https://github.com/settings/tokens>.
+
+### Precedence
+
+`--token` flag → `GITHUB_TOKEN` env → saved login → anonymous.
 
 ## Quick start
 
