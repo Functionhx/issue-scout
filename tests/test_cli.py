@@ -15,6 +15,16 @@ from issue_scout.models import Comment, IssueInfo
 runner = CliRunner()
 
 
+def _combined_output(result) -> str:
+    """Click <8.2 mixes stderr into output; >=8.2 separates them. Handle both."""
+    out = result.output or ""
+    try:
+        out += result.stderr or ""
+    except (ValueError, AttributeError):
+        pass
+    return out
+
+
 def _fake_issue(number=1):
     return IssueInfo(
         number=number,
@@ -57,7 +67,7 @@ def test_missing_token_exits_1(monkeypatch):
     monkeypatch.delenv("GITHUB_TOKEN", raising=False)
     result = runner.invoke(app, ["o/r"])
     assert result.exit_code == 1
-    assert "GITHUB_TOKEN" in result.stderr or "GITHUB_TOKEN" in result.output
+    assert "GITHUB_TOKEN" in _combined_output(result)
 
 
 def test_bad_repo_format_exits_1(monkeypatch):
@@ -105,4 +115,4 @@ def test_client_error_exits_1(monkeypatch):
     monkeypatch.setattr(cli_module, "GitHubClient", BoomClient)
     result = runner.invoke(app, ["o/r"])
     assert result.exit_code == 1
-    assert "nope" in result.stderr or "nope" in result.output
+    assert "nope" in _combined_output(result)
