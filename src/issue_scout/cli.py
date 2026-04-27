@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Optional
 
 import typer
 from rich.console import Console
@@ -37,10 +38,10 @@ def scout(
     fmt: str = typer.Option(
         "table", "--format", "-f", help="Output format: table | json | md"
     ),
-    output: Path | None = typer.Option(
+    output: Optional[Path] = typer.Option(
         None, "--output", "-o", help="Write output to a file instead of stdout."
     ),
-    token: str | None = typer.Option(
+    token: Optional[str] = typer.Option(
         None, "--token", envvar="GITHUB_TOKEN", help="GitHub API token (required)."
     ),
 ):

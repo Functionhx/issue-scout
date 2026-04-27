@@ -45,7 +45,7 @@ def _run_raw(repo: str, labels: list[str], max_issues: int) -> int:
     return 0
 
 
-def _run_cli(repo: str, labels: list[str], max_issues: int, fmt: str) -> int:
+def _run_cli(repo: str, labels: list[str], max_issues: int, fmt: str, token: str | None) -> int:
     from typer.testing import CliRunner
 
     from issue_scout.cli import app
@@ -53,6 +53,8 @@ def _run_cli(repo: str, labels: list[str], max_issues: int, fmt: str) -> int:
     args: list[str] = [repo, "--max-issues", str(max_issues), "--format", fmt]
     for label in labels:
         args.extend(["--labels", label])
+    if token:
+        args.extend(["--token", token])
 
     runner = CliRunner()
     result = runner.invoke(app, args)
@@ -70,11 +72,19 @@ def main() -> int:
     parser.add_argument("--max-issues", type=int, default=5)
     parser.add_argument("--format", default="table", choices=["table", "json", "md"])
     parser.add_argument("--raw", action="store_true", help="Bypass CLI; dump raw IssueInfo")
+    parser.add_argument(
+        "--token",
+        default=os.environ.get("GITHUB_TOKEN"),
+        help="GitHub token (defaults to $GITHUB_TOKEN).",
+    )
     args = parser.parse_args()
+
+    if args.token:
+        os.environ["GITHUB_TOKEN"] = args.token
 
     if args.raw:
         return _run_raw(args.repo, args.labels, args.max_issues)
-    return _run_cli(args.repo, args.labels, args.max_issues, args.format)
+    return _run_cli(args.repo, args.labels, args.max_issues, args.format, args.token)
 
 
 if __name__ == "__main__":
